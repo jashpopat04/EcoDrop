@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
       loginBtn.disabled = true;
 
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("https://ecodrop-9hq1.onrender.com/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

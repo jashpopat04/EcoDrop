@@ -334,7 +334,7 @@
                         </li>
                         <li
                             class="flex items-center gap-4 p-4 rounded-3xl bg-white/10 backdrop-blur-sm hover:bg-[#6b9b76]/20 transition-all hover:scale-105">
-                            <i class="fas fa-map-marker-alt text-[#f4d03f]"></i>    
+                            <i class="fas fa-map-marker-alt text-[#f4d03f]"></i>
                             <span class="font-semibold">Delhi</span>
                         </li>
                     </ul>
@@ -361,8 +361,11 @@
             </div>
         </div>
     </footer>
-
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/login.js"></script>
     <script>
+
+
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -379,47 +382,47 @@
             document.getElementById('mobileMenu').classList.add('hidden');
         }
 
-            const navbar = document.getElementById("navbar");
-            const navBrand = document.getElementById("navBrand");
-            const navLinks = document.getElementById("navLinks");
-            const navSignin = document.getElementById("navSignin");
-            const navSignup = document.getElementById("navSignup");
+        const navbar = document.getElementById("navbar");
+        const navBrand = document.getElementById("navBrand");
+        const navLinks = document.getElementById("navLinks");
+        const navSignin = document.getElementById("navSignin");
+        const navSignup = document.getElementById("navSignup");
 
-            window.addEventListener("scroll", function() {
+        window.addEventListener("scroll", function () {
 
-    if (window.scrollY > 100) {
+            if (window.scrollY > 100) {
 
                 navbar.classList.add("bg-white", "shadow-xl");
 
-            navBrand.classList.remove("text-white");
-            navBrand.classList.add("text-[#2d5a4a]");
+                navBrand.classList.remove("text-white");
+                navBrand.classList.add("text-[#2d5a4a]");
 
-            navLinks.classList.remove("text-white");
-            navLinks.classList.add("text-[#2d5a4a]");
+                navLinks.classList.remove("text-white");
+                navLinks.classList.add("text-[#2d5a4a]");
 
-            navSignin.classList.remove("text-white");
-            navSignin.classList.add("text-[#2d5a4a]");
+                navSignin.classList.remove("text-white");
+                navSignin.classList.add("text-[#2d5a4a]");
 
-            navSignup.classList.remove("bg-white");
-            navSignup.classList.add("bg-[#2d5a4a]", "text-white");
+                navSignup.classList.remove("bg-white");
+                navSignup.classList.add("bg-[#2d5a4a]", "text-white");
 
-    } else {
+            } else {
 
                 navbar.classList.remove("bg-white", "shadow-xl");
 
-            navBrand.classList.remove("text-[#2d5a4a]");
-            navBrand.classList.add("text-white");
+                navBrand.classList.remove("text-[#2d5a4a]");
+                navBrand.classList.add("text-white");
 
-            navLinks.classList.remove("text-[#2d5a4a]");
-            navLinks.classList.add("text-white");
+                navLinks.classList.remove("text-[#2d5a4a]");
+                navLinks.classList.add("text-white");
 
-            navSignin.classList.remove("text-[#2d5a4a]");
-            navSignin.classList.add("text-white");
+                navSignin.classList.remove("text-[#2d5a4a]");
+                navSignin.classList.add("text-white");
 
-            navSignup.classList.remove("bg-[#2d5a4a]", "text-white");
-            navSignup.classList.add("bg-white", "text-[#2d5a4a]");
-    }
-});
+                navSignup.classList.remove("bg-[#2d5a4a]", "text-white");
+                navSignup.classList.add("bg-white", "text-[#2d5a4a]");
+            }
+        });
 
 
     </script>
