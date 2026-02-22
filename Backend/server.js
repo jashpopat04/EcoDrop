@@ -7,20 +7,19 @@ require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors({
-  origin: "https://jashpopat04.github.io",
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
 
 app.use(express.json());
 // 🚀 NAYA ADDITION: Backend ko bolo ki Frontend folder serve kare
 // app.use(express.static(path.join(__dirname, "../Frontend")));
 
 // 🚀 NAYA ADDITION: Jab koi direct "localhost:5000" khole, toh seedha Login page aaye
-// app.get("/", (req, res) => {
-//   res.sendFile(path.join(__dirname, "../docs/pages/login.html"));
-// });
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../docs/index.html"));
+});
 
 // Tere baaki routes iske neeche hone chahiye...
 // app.use("/api/users", userRoutes);
