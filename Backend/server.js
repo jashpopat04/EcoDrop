@@ -6,7 +6,11 @@ const Razorpay = require('razorpay');
 require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://jashpopat04.github.io",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 
 app.use(express.json());
