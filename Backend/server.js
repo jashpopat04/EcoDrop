@@ -14,9 +14,9 @@ app.use(express.json());
 // app.use(express.static(path.join(__dirname, "../Frontend")));
 
 // 🚀 NAYA ADDITION: Jab koi direct "localhost:5000" khole, toh seedha Login page aaye
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../docs/pages/login.html"));
-});
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../docs/pages/login.html"));
+// });
 
 // Tere baaki routes iske neeche hone chahiye...
 // app.use("/api/users", userRoutes);
