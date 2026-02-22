@@ -5,15 +5,13 @@ const cors = require("cors");
 const Razorpay = require('razorpay');
 require("dotenv").config();
 const PORT = process.env.PORT || 5000;
-
-app.use(cors());
-
 const app = express();
-
 app.use(cors());
+
+
 app.use(express.json());
 // 🚀 NAYA ADDITION: Backend ko bolo ki Frontend folder serve kare
-app.use(express.static(path.join(__dirname, "../Frontend")));
+// app.use(express.static(path.join(__dirname, "../Frontend")));
 
 // 🚀 NAYA ADDITION: Jab koi direct "localhost:5000" khole, toh seedha Login page aaye
 app.get("/", (req, res) => {
