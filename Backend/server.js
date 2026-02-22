@@ -14,11 +14,12 @@ app.use(cors({
 
 app.use(express.json());
 // 🚀 NAYA ADDITION: Backend ko bolo ki Frontend folder serve kare
-// app.use(express.static(path.join(__dirname, "../Frontend")));
+app.use(express.static(path.join(__dirname, "../docs")));
 
 // 🚀 NAYA ADDITION: Jab koi direct "localhost:5000" khole, toh seedha Login page aaye
+// 🚀 FIX: Path ko sahi folder (Frontend) par point karo
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../docs/index.html"));
+  res.sendFile(path.join(__dirname, "../Frontend/index.html"));
 });
 
 // Tere baaki routes iske neeche hone chahiye...
@@ -72,13 +73,13 @@ app.get("/api/protected", protect, (req, res) => {
   res.json({ message: "You are authenticated", user: req.user });
 });
 
-app.get("/", (req, res) => {
-  res.send("EcoDrop API Running");
-});
+// app.get("/", (req, res) => {
+//   res.send("EcoDrop API Running");
+// });
 
-app.get("/", (req, res) => {
-  res.send("EcoDrop Backend is Live 🚀");
-});
+// app.get("/", (req, res) => {
+//   res.send("EcoDrop Backend is Live 🚀");
+// });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
