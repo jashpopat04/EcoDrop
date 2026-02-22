@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EcoDrop – Admin Pro</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ENTERPRISE ESG THEME CSS - FIGMA MATCHED */
+    :root { --primary-dark: #15803D; --primary-light: #22C55E; --bg-color: #F8FAFC; --panel-bg: #FFFFFF; --text-main: #0F172A; --text-muted: #64748B; --border-color: #E2E8F0; --green-light: #DCFCE7; --red-light: #FEE2E2; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+    body { display: flex; height: 100vh; overflow: hidden; background: var(--bg-color); color: var(--text-main); }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; background: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 24px 0; flex-shrink: 0; z-index: 10; }
+    .brand { font-size: 22px; font-weight: 800; padding: 0 24px; margin-bottom: 35px; display: flex; align-items: center; gap: 12px; color: var(--text-main);}
+    .brand-icon { background: var(--primary-light); color: white; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .menu-label { font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 700; letter-spacing: 1px; padding: 0 24px; margin-bottom: 8px; margin-top: 15px; }
+    .menu-item { padding: 12px 24px; margin: 4px 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 12px; }
+    .menu-item:hover { background: #F1F5F9; color: var(--text-main); } .menu-item.active { background: var(--green-light); color: var(--primary-dark); }
+    .sidebar-divider { height: 1px; background: var(--border-color); margin: 20px 24px; border: none; } .spacer { flex: 1; }
+    .logout-menu { color: #EF4444; } .logout-menu:hover { background: var(--red-light); color: #DC2626; }
+
+    /* MAIN CONTENT */
+    .main-content { flex: 1; overflow-y: auto; padding: 30px; background: var(--bg-color); }
+    .tab-content { display: none; animation: fadeIn 0.3s ease; } .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .header-title { margin-bottom: 24px; } .header-title h1 { font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;} .header-title p { font-size: 14px; color: var(--text-muted); }
+
+    /* CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+    .stat-card { background: var(--panel-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    .stat-card-header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .stat-card-header .icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;}
+    .ic-green { background: var(--green-light); color: var(--primary-dark); } .ic-orange { background: #FEF3C7; color: #D97706; }
+    .stat-card h2 { font-size: 26px; color: var(--text-main); font-weight: 700;}
+
+    /* CONTENT BOX & TABLES */
+    .content-box { background: var(--panel-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    .box-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;}
+    .box-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px; font-size: 12px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border-color); }
+    td { padding: 16px 12px; font-size: 14px; font-weight: 500; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+    
+    .action-cell { display: flex; gap: 10px; align-items: center; }
+    .btn-circle-check { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; transition: 0.2s;} .btn-circle-check:hover { background: var(--primary-dark); transform: scale(1.05); }
+    .btn-circle-cross { width: 32px; height: 32px; border-radius: 50%; background: white; color: #EF4444; border: 1px solid #EF4444; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; transition: 0.2s;} .btn-circle-cross:hover { background: #FEF2F2; transform: scale(1.05); }
+
+    /* WAREHOUSE BARS */
+    .warehouse-item { margin-bottom: 20px; } .wh-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; } .wh-name { font-weight: 600; color: var(--text-main); }
+    .progress-track { background: #F1F5F9; height: 8px; border-radius: 8px; overflow: hidden; } .progress-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
+    .fill-red { background: #EF4444; } .fill-orange { background: #F59E0B; } .fill-green { background: var(--primary-light); }
+
+    /* PODIUMS */
+    .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 16px; margin-top: 30px; height: 220px; }
+    .podium { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px 12px 0 0; text-align: center; padding: 16px 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative; width: 140px; }
+    .podium.rank-1 { height: 180px; border: 2px solid var(--primary-light); background: #F0FDF4; z-index: 2; box-shadow: 0 -4px 15px rgba(34, 197, 94, 0.1); } .podium.rank-2 { height: 140px; } .podium.rank-3 { height: 120px; }
+    .rank-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; border: 2px solid white;}
+    .rank-1 .rank-badge { background: var(--primary-dark); } .rank-2 .rank-badge { background: #94A3B8; } .rank-3 .rank-badge { background: #D97706; }
+    .podium-name { font-weight: 700; font-size: 14px; color: var(--text-main); margin-top: 10px; } .podium-stat { font-size: 18px; font-weight: 800; color: var(--text-main); margin-top: auto; } .podium-sub { font-size: 11px; color: var(--text-muted); }
+
+    /* CHARTS */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px; }
+    .chart-box { background: var(--panel-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(0,0,0,0.02); height: 350px; display: flex; flex-direction: column; }
+    .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
+
+    /* RECYCLER LOGISTICS CARDS */
+    .pickup-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 16px; background: white; }
+    .pc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .pc-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; } .bg-green { background: var(--green-light); color: var(--primary-dark); } .bg-orange { background: #FEF3C7; color: #D97706; }
+    .pc-details { font-size: 13px; color: var(--text-muted); display: flex; gap: 16px; margin-bottom: 20px; }
+    .pc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F1F5F9; padding-top: 16px; }
+    .pc-time { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .pc-actions { display: flex; gap: 12px; }
+    .btn-solid-green { background: var(--primary-light); color: white; padding: 8px 16px; border-radius: 6px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;} .btn-solid-green:hover { background: var(--primary-dark); }
+    .btn-outline { background: white; color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; } .btn-outline:hover { background: #F8FAFC; }
+
+    /* RIGHT PANEL */
+    .right-panel { width: 300px; background: var(--bg-color); border-left: 1px solid var(--border-color); padding: 30px 24px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; overflow-y: auto;}
+    .right-widget { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    .widget-title { font-size: 14px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .activity-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 16px; color: var(--text-muted);} .activity-val { font-weight: 700; color: var(--text-main); }
+    .widget-top-performer { background: #F0FDF4; border: 1px solid #BBF7D0; } .widget-top-performer .widget-title { color: var(--primary-dark); }
+    .performer-name { font-size: 20px; font-weight: 800; color: var(--primary-dark); margin-bottom: 4px; } .performer-sub { font-size: 13px; color: #166534; font-weight: 500; margin-bottom: 12px; } .performer-verified { font-size: 11px; color: #15803D; display: flex; align-items: center; gap: 4px;}
+    .impact-val { font-size: 28px; font-weight: 800; color: var(--primary-dark); margin-bottom: 4px; } .impact-sub { font-size: 12px; color: var(--primary-dark); background: var(--green-light); padding: 6px 10px; border-radius: 6px; display: inline-block; font-weight: 600; margin-top: 10px;}
+
+    /* MODALS */
+    .logistics-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(2px); }
+    .lm-content { background: #fff; border-radius: 16px; width: 850px; max-width: 95%; height: 600px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); animation: fadeIn 0.3s ease;}
+    .lm-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; } .lm-header h2 { font-size: 18px; color: var(--text-main); font-weight: 700; }
+    .lm-close { font-size: 20px; color: var(--text-muted); cursor: pointer; border: none; background: none; }
+    
+    .lm-body { display: flex; flex: 1; overflow: hidden; }
+    .lm-left { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; border-right: 1px solid var(--border-color);}
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .info-block { font-size: 13px; } .info-label { color: var(--text-muted); display: block; margin-bottom: 4px; } .info-val { font-weight: 600; color: var(--text-main); }
+    
+    .section-title { font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin-bottom: 12px;}
+    .clickable-card { border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; background: white;} .clickable-card:hover { border-color: #94A3B8; } .clickable-card.active { border: 2px solid var(--primary-light); background: #F0FDF4; }
+    .radio-circle { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #CBD5E1; display: flex; align-items: center; justify-content: center; } .clickable-card.active .radio-circle { border-color: var(--primary-light); } .clickable-card.active .radio-circle::after { content: ''; width: 8px; height: 8px; background: var(--primary-light); border-radius: 50%; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--text-main); } .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .lm-right { width: 300px; padding: 24px; background: #FAFAF9; overflow-y: auto;}
+    .timeline { position: relative; padding-left: 20px; margin-top: 20px; } .timeline::before { content: ''; position: absolute; left: 7px; top: 10px; bottom: 20px; width: 2px; background: #E2E8F0; }
+    .tl-item { position: relative; margin-bottom: 30px; } .tl-dot { position: absolute; left: -21px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: white; border: 2px solid #CBD5E1; z-index: 2;}
+    .tl-content { padding-left: 12px; } .tl-title { font-size: 14px; font-weight: 600; color: var(--text-muted); } .tl-time { font-size: 11px; color: #94A3B8; margin-top: 4px; }
+    .tl-item.completed .tl-dot { background: white; border-color: var(--primary-light); display: flex; align-items: center; justify-content: center; } .tl-item.completed .tl-dot::after { content: '✓'; color: var(--primary-light); font-size: 10px; font-weight: bold;} .tl-item.completed .tl-title { color: var(--text-main); }
+    .btn-update-logistics { width: 100%; background: var(--primary-light); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; margin-top: 10px;} .btn-update-logistics:hover { background: var(--primary-dark); }
+  
+  .dashboard-logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  transition: 0.3s ease;
+}
+
+.dashboard-logo:hover {
+  transform: scale(1.05);
+}
+  
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand"><div class="logo-section">
+  <img src="../assets/images/logo.png" alt="EcoDrop Logo" class="dashboard-logo">
+</div> EcoDrop</div>
+    <div class="menu-label">Main Menu</div>
+    <div class="menu-item active" onclick="switchTab('tab-dashboard', this)"><span style="font-size: 18px; width: 24px;">⊞</span> Dashboard</div>
+    <div class="menu-item" onclick="switchTab('tab-analytics', this)"><span style="font-size: 18px; width: 24px;">📊</span> Analytics</div>
+    <div class="menu-label" style="margin-top: 20px;">Operations</div>
+    <div class="menu-item" onclick="switchTab('tab-approvals', this)"><span style="font-size: 18px; width: 24px;">📋</span> Approvals Mgmt</div>
+    <div class="menu-item" onclick="switchTab('tab-recyclers', this)"><span style="font-size: 18px; width: 24px;">🏭</span> Recycler Logistics</div>
+    <div class="spacer"></div>
+    <hr class="sidebar-divider">
+    <div class="menu-item logout-menu" id="logoutBtn"><span style="font-size: 18px; width: 24px;">🚪</span> Logout</div>
+  </aside>
+
+  <main class="main-content">
+    
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="header-title"><h1>Dashboard Overview</h1><p>Monitor and manage your e-waste recycling operations</p></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-card-header"><div class="icon ic-green">📦</div> Total Pickups</div><h2 id="totWasteCount">0</h2></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="icon ic-orange">⏳</div> Pending Approvals</div><h2 id="totPending">0</h2></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="icon ic-green">🌿</div> Total CO₂ Saved</div><h2 id="totCO2Main">0 kg</h2></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="icon ic-green">💲</div> Revenue Processed</div><h2 id="totCommissionMain">₹0</h2></div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">Pending Pickup Approvals <span style="background:#FEF3C7; color:#D97706; font-size:12px; padding:4px 10px; border-radius:20px; font-weight:600;" id="dashPendingBadge">0 Pending</span></div>
+        <div class="box-subtitle">Review and approve pickup requests</div>
+        <table>
+          <thead><tr><th>Seller Name</th><th>Item Name</th><th>Warehouse</th><th>Waste Type</th><th>Est. Weight</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="dashApprovalsBody"><tr><td colspan="7" style="text-align:center;">Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">Warehouse Capacity Overview</div><div class="box-subtitle">Real-time capacity monitoring across all locations</div>
+        <div class="warehouse-item"><div class="wh-header"><div><span class="wh-name">Pune Warehouse</span> <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">• Battery</span></div><span style="font-weight: 700; color:#EF4444">185kg / 200kg <span style="font-size:11px;">93% Full</span></span></div><div class="progress-track"><div class="progress-fill fill-red" style="width: 93%;"></div></div></div>
+        <div class="warehouse-item"><div class="wh-header"><div><span class="wh-name">Mumbai Central</span> <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">• PCB</span></div><span style="font-weight: 700; color:#F59E0B">142kg / 250kg <span style="font-size:11px;">57% Full</span></span></div><div class="progress-track"><div class="progress-fill fill-orange" style="width: 57%;"></div></div></div>
+        <div class="warehouse-item"><div class="wh-header"><div><span class="wh-name">Delhi Warehouse</span> <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">• Cable</span></div><span style="font-weight: 700; color:var(--primary-light)">95kg / 200kg <span style="font-size:11px;">48% Full</span></span></div><div class="progress-track"><div class="progress-fill fill-green" style="width: 48%;"></div></div></div>
+      </div>
+
+      <div class="content-box"><div class="box-title">Top Performing Sellers</div><div class="box-subtitle">Based on verified e-waste submitted</div><div class="podium-container" id="sellerPodiumContainer"></div></div>
+      <div class="content-box"><div class="box-title">Top Performing Recyclers</div><div class="box-subtitle">Based on total batches purchased</div><div class="podium-container" id="recyclerPodiumContainer"></div></div>
+    </div>
+
+    <div id="tab-analytics" class="tab-content">
+      <div class="header-title"><h1>Analytics Hub</h1><p>Deep dive into platform data and environment impact</p></div>
+      <div class="charts-grid">
+        <div class="chart-box"><div class="box-title">E-Waste Categories</div><div class="chart-wrapper"><canvas id="categoryChart"></canvas></div></div>
+        <div class="chart-box"><div class="box-title">Platform Activity</div><div class="chart-wrapper"><canvas id="statusChart"></canvas></div></div>
+      </div>
+    </div>
+
+    <div id="tab-approvals" class="tab-content">
+      <div class="header-title"><h1>Approvals Management</h1><p>Full list of pending and verified items</p></div>
+      <div class="content-box">
+        <table>
+          <thead><tr><th>Seller Name</th><th>Warehouse</th><th>Waste Type</th><th>Item Name</th><th>Est. Weight</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="fullApprovalsBody"><tr><td colspan="8" style="text-align:center;">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-recyclers" class="tab-content">
+      <div class="header-title"><h1>Recent Pickup Acceptances</h1><p>Operational visibility and control over pickup workflow</p></div>
+      <div id="recyclerCardsContainer"><p style="text-align:center; padding: 30px; color:var(--text-muted);">Loading logistics data...</p></div>
+    </div>
+
+  </main>
+
+  <aside class="right-panel">
+    <div class="right-widget"><div class="widget-title">⏱️ Today's Activity</div><div class="activity-row"><span>New Pickups</span><span class="activity-val" id="todayListings">0</span></div><div class="activity-row" style="margin-bottom: 0;"><span>Active Users</span><span class="activity-val" id="todayVerified">0</span></div></div>
+    <div class="right-widget widget-top-performer"><div class="widget-title">🚀 Top Performer Today</div><div class="performer-name" id="topPerformerName">Loading...</div><div class="performer-sub" id="topPerformerStat">0 kg collected</div><div class="performer-verified">👤 Verified Recycler</div></div>
+    <div class="right-widget"><div class="widget-title">🌿 Impact Summary</div><div class="impact-val" id="sideCO2">0 kg</div><div style="font-size:12px; color:var(--text-muted);">CO₂ Saved Today</div><div class="impact-sub" id="sideTrees">Equivalent to 0 trees</div></div>
+  </aside>
+
+  <div class="logistics-modal" id="verifyModal" style="z-index: 3000;">
+    <div class="lm-content" style="width: 400px; height: auto;">
+      <div class="lm-header"><h2>Verify Request</h2><button class="lm-close" onclick="closeModal()">×</button></div>
+      <div style="padding: 24px;">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Enter market value. System logic applies deductions.</p>
+        <input type="number" id="finalValueInput" placeholder="₹ Enter Final Value" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; outline: none; font-size:16px;">
+        <button class="btn-solid-green" style="width: 100%; padding: 12px;" id="confirmVerifyBtn">Approve Item</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="logistics-modal" id="pickupModal">
+    <div class="lm-content">
+      <div class="lm-header"><h2>Pickup Management <span id="modalWasteId" style="color:#94A3B8; font-size:12px; margin-left:8px; font-weight:normal;">#ID</span></h2><button class="lm-close" onclick="closePickupModal()">×</button></div>
+      <div class="lm-body">
+        <div class="lm-left">
+          <div class="section-title">Pickup Information</div>
+          <div class="info-grid" style="margin-bottom: 24px;">
+            <div class="info-block"><span class="info-label">Recycler:</span><span class="info-val" id="lm-recycler">Loading...</span></div>
+            <div class="info-block"><span class="info-label">Waste Type:</span><span class="info-val" id="lm-item">Loading...</span></div>
+            <div class="info-block"><span class="info-label">Weight:</span><span class="info-val" id="lm-weight">0 kg</span></div>
+            <div class="info-block"><span class="info-label">Warehouse:</span><span class="info-val" id="lm-warehouse">Loading...</span></div>
+            <div class="info-block"><span class="info-label">Total Paid (with 10% Fee):</span><span class="info-val" id="lm-amount" style="color:var(--primary-dark); font-size:16px;">₹0.00</span></div>
+          </div>
+          <div class="section-title">🚚 Assign Driver</div>
+          <div id="driverSelectionArea">
+            <div class="clickable-card driver-card" onclick="selectDriver(this, 'Rajesh Kumar')"><div class="radio-circle"></div><div><div class="card-title">Rajesh Kumar</div><div class="card-sub">+91 98765 43210 • MH 12 AB 1234</div></div></div>
+            <div class="clickable-card driver-card" onclick="selectDriver(this, 'Amit Sharma')"><div class="radio-circle"></div><div><div class="card-title">Amit Sharma</div><div class="card-sub">+91 98765 43211 • MH 12 CD 5678</div></div></div>
+            <div class="clickable-card driver-card" onclick="selectDriver(this, 'Vikram Singh')"><div class="radio-circle"></div><div><div class="card-title">Vikram Singh</div><div class="card-sub">+91 98765 43212 • MH 12 EF 9012</div></div></div>
+          </div>
+          <div class="section-title" style="margin-top: 10px;">✅ Update Pickup Stage</div>
+          <div id="stageSelectionArea" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+             <div class="clickable-card stage-card" onclick="selectStage(this, 'Driver Assigned')"><div class="radio-circle"></div><div class="card-title">Driver Assigned</div></div>
+             <div class="clickable-card stage-card" onclick="selectStage(this, 'In Transit')"><div class="radio-circle"></div><div class="card-title">In Transit</div></div>
+             <div class="clickable-card stage-card" onclick="selectStage(this, 'At Warehouse')"><div class="radio-circle"></div><div class="card-title">At Warehouse</div></div>
+             <div class="clickable-card stage-card" onclick="selectStage(this, 'Completed')"><div class="radio-circle"></div><div class="card-title">Completed</div></div>
+          </div>
+          <button class="btn-update-logistics" onclick="saveLogisticsData()">Confirm Driver & Update Stage</button>
+        </div>
+        <div class="lm-right">
+          <div class="section-title">Activity Log</div>
+          <div class="timeline" id="timelineContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:5000/api";
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    if (!token || role !== "admin") { window.location.href = "login.html"; }
+
+    let globalWastes = []; let currentVerifyingId = null; let currentLogisticsId = null;
+    let selectedDriver = ""; let selectedStage = "Pending";
+    let catChartInstance = null; let statChartInstance = null;
+
+    function switchTab(tabId, element) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      element.classList.add('active');
+      if(tabId === 'tab-analytics' && catChartInstance) { catChartInstance.resize(); statChartInstance.resize(); }
+    }
+
+    const loadSystemData = async () => {
+      try {
+        const dashRes = await fetch(`${API_BASE}/waste/admin/dashboard`, { headers: { "Authorization": `Bearer ${token}` } });
+        const dashData = await dashRes.json();
+        document.getElementById("totCommissionMain").textContent = `₹${(dashData.totalCommission || 0).toLocaleString()}`;
+
+        const wasteRes = await fetch(`${API_BASE}/waste/admin/all-wastes`, { headers: { "Authorization": `Bearer ${token}` } });
+        globalWastes = await wasteRes.json();
+        processDataForUI();
+      } catch (err) { console.error("Data load failed", err); }
+    };
+
+    const processDataForUI = () => {
+      let totalKG = 0, pendingCount = 0, verifiedCount = 0;
+      let sellersMap = {}, recyclersMap = {}, categories = {}, statuses = { pending: 0, verified: 0, sold: 0 };
+
+      const dashTbody = document.getElementById("dashApprovalsBody");
+      const fullTbody = document.getElementById("fullApprovalsBody");
+      const recContainer = document.getElementById("recyclerCardsContainer");
+      
+      dashTbody.innerHTML = ""; fullTbody.innerHTML = ""; recContainer.innerHTML = "";
+
+      globalWastes.forEach(w => {
+        totalKG += w.weight || 0;
+        const isPending = w.status !== "listed_for_recycler" && w.status !== "sold";
+        if(isPending) pendingCount++; else verifiedCount++;
+
+        categories[w.category] = (categories[w.category] || 0) + 1;
+        if(w.status === "listed_for_recycler") statuses.verified++;
+        else if(w.status === "sold") statuses.sold++;
+        else statuses.pending++;
+
+        const dateStr = new Date(w.createdAt).toLocaleDateString('en-GB');
+        const itemName = w.itemName || w.name || w.title || 'E-Waste Item'; // 🚀 ITEM NAME FETCH KIYA
+
+        if(isPending) {
+            dashTbody.innerHTML += `
+              <tr>
+                <td style="font-weight:600; color:var(--text-main);">${w.seller ? w.seller.name : "Unknown"}</td>
+                <td style="font-weight:700; color:var(--primary-dark);">${itemName}</td> <td>${w.warehouse || "Pune Warehouse"}</td>
+                <td style="text-transform:capitalize;">
+                  ${w.category.replace('-', ' ')}
+                  <div style="font-size:11px; font-weight:700; margin-top:4px; color:${w.method === 'pickup' ? '#D97706' : '#15803D'};">
+                    ${w.method === 'pickup' ? '🚚 Doorstep Pickup' : '🏢 Self Drop'}
+                  </div>
+                </td>
+                <td style="font-weight:600;">${(w.weight).toFixed(2)}kg</td>
+                <td>${dateStr}</td>
+                <td class="action-cell"><button class="btn-circle-check" onclick="openVerifyModal('${w._id}')">✓</button><button class="btn-circle-cross" onclick="alert('Reject logic here')">✕</button></td>
+              </tr>
+            `;
+        }
+
+        if(w.status !== "sold") {
+             const statusBadge = isPending ? `<span style="background:#FEF3C7; color:#D97706; font-size:11px; padding:4px 8px; border-radius:12px; font-weight:600;">Pending</span>` : `<span style="background:var(--green-light); color:var(--primary-dark); font-size:11px; padding:4px 8px; border-radius:12px; font-weight:600;">Verified</span>`;
+             
+             // 🚀 AMOUNT LOGIC: Agar pending hai toh 0, verified hai toh finalValue dikhao
+             const amountPaid = w.finalValue ? `₹${w.finalValue.toLocaleString()}` : `<span style="color:var(--text-muted);">TBD</span>`;
+
+             fullTbody.innerHTML += `
+            <tr>
+              <td style="font-weight:600;">${w.seller ? w.seller.name : "Unknown"}</td>
+              <td>${w.warehouse || "Not Selected"}</td>
+              <td style="text-transform:capitalize;">${w.category.replace('-', ' ')}</td>
+              <td style="font-weight:700; color:var(--primary-dark);">${itemName}</td> 
+              <td style="font-weight:600;">${(w.weight).toFixed(2)} kg</td>
+              <td style="font-weight:800; color:#15803D;">${amountPaid}</td> 
+              <td>${dateStr}</td> 
+              <td>${statusBadge}</td> 
+            </tr>
+          `;
+        }
+
+        if(w.status === "sold" && w.recycler) {
+            const currentStage = w.pickupStage || "Accepted";
+            const badgeClass = currentStage === "Completed" ? "bg-green" : "bg-orange";
+            const shortId = w._id.slice(-6).toUpperCase();
+            
+            recContainer.innerHTML += `
+              <div class="pickup-card">
+                <div class="pc-header"><div class="pc-title">${w.recycler.name} <span class="status-badge ${badgeClass}">${currentStage}</span></div></div>
+                <div class="pc-details"><span>Pickup #PK${shortId}</span> • <span style="text-transform:capitalize;">${w.category.replace('-',' ')}</span> • <span style="font-weight:600; color:var(--text-main);">${w.itemName || 'E-Waste Item'}</span> • <span>${(w.weight).toFixed(2)}kg</span> • <span>${w.warehouse || 'Pune Warehouse'}</span></div>
+                <div class="pc-footer">
+                  <div class="pc-time">🕒 Updated: ${new Date(w.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                  <div class="pc-actions"><button class="btn-outline" onclick="openPickupModal('${w._id}')">View Details</button><button class="btn-solid-green" onclick="openPickupModal('${w._id}')">Assign Driver</button></div>
+                </div>
+              </div>
+            `;
+        }
+
+        if(w.seller) { if(!sellersMap[w.seller._id]) sellersMap[w.seller._id] = { name: w.seller.name, kg: 0 }; sellersMap[w.seller._id].kg += w.weight; }
+        if(w.recycler && w.status === 'sold') { if(!recyclersMap[w.recycler._id]) recyclersMap[w.recycler._id] = { name: w.recycler.name, items: 0, kg: 0 }; recyclersMap[w.recycler._id].items += 1; recyclersMap[w.recycler._id].kg += w.weight;}
+      });
+
+      // 🚀 COLSPAN SET TO 7 (Important so table layout doesn't break when empty)
+      if(dashTbody.innerHTML === "") dashTbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No pending approvals.</td></tr>`;
+      if(fullTbody.innerHTML === "") fullTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No items found.</td></tr>`;
+      if(recContainer.innerHTML === "") recContainer.innerHTML = `<p style="text-align:center; padding: 30px; color:var(--text-muted);">No recent pickups.</p>`;
+
+      document.getElementById("totWasteCount").textContent = globalWastes.length;
+      document.getElementById("totPending").textContent = pendingCount;
+      document.getElementById("dashPendingBadge").textContent = `${pendingCount} Pending`;
+      
+      const co2 = (totalKG * 0.8);
+      document.getElementById("totCO2Main").textContent = `${co2.toFixed(0)} kg`; 
+      document.getElementById("todayListings").textContent = pendingCount; 
+      document.getElementById("todayVerified").textContent = verifiedCount;
+      document.getElementById("sideCO2").textContent = `${co2.toFixed(0)} kg`;
+      document.getElementById("sideTrees").textContent = `Equivalent to ${Math.round(co2 / 20)} trees`;
+
+      const topRecyclers = Object.values(recyclersMap).sort((a,b) => b.kg - a.kg);
+      if(topRecyclers.length > 0) {
+        document.getElementById("topPerformerName").textContent = topRecyclers[0].name;
+        document.getElementById("topPerformerStat").textContent = `${topRecyclers[0].kg.toFixed(0)} kg collected`;
+      }
+
+      renderPodiums(sellersMap, recyclersMap);
+      renderCharts(categories, statuses);
+    };
+
+    const renderPodiums = (sellersMap, recyclersMap) => {
+      const sellers = Object.values(sellersMap).sort((a,b) => b.kg - a.kg);
+      document.getElementById("sellerPodiumContainer").innerHTML = buildPodiumHTML(sellers, "kg collected");
+      const recyclers = Object.values(recyclersMap).sort((a,b) => b.items - a.items);
+      document.getElementById("recyclerPodiumContainer").innerHTML = buildPodiumHTML(recyclers, "batches bought");
+    };
+
+    const buildPodiumHTML = (arr, unitLabel) => {
+      if(arr.length === 0) return `<p style="color:var(--text-muted); margin-top:50px; font-weight:600;">No data available yet.</p>`;
+      const r1 = arr[0] || {name: '-', val: 0}; const r2 = arr[1] || {name: '-', val: 0}; const r3 = arr[2] || {name: '-', val: 0};
+      const val1 = r1.kg !== undefined ? r1.kg.toFixed(2) : r1.items; const val2 = r2.kg !== undefined ? r2.kg.toFixed(2) : r2.items; const val3 = r3.kg !== undefined ? r3.kg.toFixed(2) : r3.items;
+      return `
+        <div class="podium rank-2"><div class="rank-badge">2</div><div class="podium-name">${r2.name}</div><div style="margin-top:auto;"><div class="podium-stat">${val2 || 0}</div><div class="podium-sub">${unitLabel}</div></div></div>
+        <div class="podium rank-1"><div class="rank-badge">1</div><div class="podium-name">${r1.name}</div><div style="margin-top:auto;"><div class="podium-stat" style="color:var(--primary-dark); font-size:24px;">${val1 || 0}</div><div class="podium-sub" style="font-weight:600; color:var(--primary-dark);">${unitLabel}</div></div></div>
+        <div class="podium rank-3"><div class="rank-badge">3</div><div class="podium-name">${r3.name}</div><div style="margin-top:auto;"><div class="podium-stat">${val3 || 0}</div><div class="podium-sub">${unitLabel}</div></div></div>
+      `;
+    };
+
+    const renderCharts = (catData, statData) => {
+      const ctxCat = document.getElementById('categoryChart').getContext('2d');
+      if(catChartInstance) catChartInstance.destroy();
+      catChartInstance = new Chart(ctxCat, { type: 'doughnut', data: { labels: Object.keys(catData).map(k => k.replace('-',' ')), datasets: [{ data: Object.values(catData), backgroundColor: ['#15803D', '#22C55E', '#F59E0B', '#3B82F6', '#8B5CF6', '#64748B'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } } });
+      const ctxStat = document.getElementById('statusChart').getContext('2d');
+      if(statChartInstance) statChartInstance.destroy();
+      statChartInstance = new Chart(ctxStat, { type: 'bar', data: { labels: ['Pending', 'Ready to Buy', 'Sold'], datasets: [{ label: 'Items', data: [statData.pending, statData.verified, statData.sold], backgroundColor: ['#F59E0B', '#22C55E', '#3B82F6'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+    };
+
+    window.openVerifyModal = (id) => { currentVerifyingId = id; document.getElementById("finalValueInput").value = ""; document.getElementById("verifyModal").style.display = "flex"; };
+    window.closeModal = () => { document.getElementById("verifyModal").style.display = "none"; currentVerifyingId = null; };
+
+    document.getElementById("confirmVerifyBtn").onclick = async () => {
+      const finalValue = Number(document.getElementById("finalValueInput").value);
+      if (!finalValue || finalValue <= 0) return alert("Please enter a valid amount!");
+      try {
+        document.getElementById("confirmVerifyBtn").textContent = "Wait...";
+        const res = await fetch(`${API_BASE}/waste/verify/${currentVerifyingId}`, { method: "PUT", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }, body: JSON.stringify({ finalValue }) });
+        if (!res.ok) throw new Error("Failed");
+        closeModal(); loadSystemData(); 
+      } catch (err) { alert("Error occurred"); } 
+      finally { document.getElementById("confirmVerifyBtn").textContent = "Approve Item"; }
+    };
+
+    window.selectDriver = (el, driverName) => { document.querySelectorAll('.driver-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); selectedDriver = driverName; };
+    window.selectStage = (el, stageName) => { document.querySelectorAll('.stage-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); selectedStage = stageName; };
+
+    window.openPickupModal = (id) => {
+      currentLogisticsId = id;
+      const w = globalWastes.find(x => x._id === id);
+      if(!w) return;
+
+      document.getElementById("modalWasteId").textContent = `#PK${id.slice(-6).toUpperCase()}`;
+      document.getElementById("lm-recycler").textContent = w.recycler.name;
+      document.getElementById("lm-item").textContent = w.itemName;
+      document.getElementById("lm-weight").textContent = `${(w.weight).toFixed(2)} kg`;
+      document.getElementById("lm-warehouse").textContent = w.warehouse || "Pune Warehouse";
+      const wasteData = w.waste || w; 
+      const baseVal = Number(wasteData.finalValue) || Number(w.finalValue) || 0;
+      const commission = baseVal * 0.1; 
+      const totalAmountPaid = baseVal + commission;
+
+      document.getElementById("lm-amount").textContent = `₹${totalAmountPaid.toFixed(2)}`;
+
+      document.querySelectorAll('.driver-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.stage-card').forEach(c => c.classList.remove('active'));
+      selectedDriver = w.driverName || "";
+      selectedStage = w.pickupStage || "Accepted";
+
+      if(selectedDriver) { const cards = document.querySelectorAll('.driver-card'); cards.forEach(c => { if(c.innerText.includes(selectedDriver.split(' ')[0])) c.classList.add('active'); }); }
+      if(selectedStage) { const stages = document.querySelectorAll('.stage-card'); stages.forEach(c => { if(c.innerText.includes(selectedStage)) c.classList.add('active'); }); }
+
+      renderTimeline(selectedStage);
+      document.getElementById("pickupModal").style.display = "flex";
+    };
+
+    window.closePickupModal = () => { document.getElementById("pickupModal").style.display = "none"; currentLogisticsId = null; };
+
+    const renderTimeline = (currentStage) => {
+      const stages = ["Accepted", "Driver Assigned", "In Transit", "At Warehouse", "Completed"];
+      const container = document.getElementById("timelineContainer");
+      container.innerHTML = "";
+      let isPast = true;
+      stages.forEach(stage => {
+        if (stage === currentStage) isPast = true; 
+        const completedClass = isPast ? "completed" : "";
+        const timeText = isPast ? new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Awaiting';
+        container.innerHTML += `<div class="tl-item ${completedClass}"><div class="tl-dot"></div><div class="tl-content"><div class="tl-title">${stage}</div><div class="tl-time">${timeText}</div></div></div>`;
+        if (stage === currentStage) isPast = false;
+      });
+    };
+
+    window.saveLogisticsData = async () => {
+      if(!selectedDriver) return alert("Please select a driver!");
+  
+      try {
+        const res = await fetch(`${API_BASE}/waste/assign-driver/${currentLogisticsId}`, {
+        method: "PUT", 
+        headers: { 
+          "Content-Type": "application/json", 
+          "Authorization": `Bearer ${token}` 
+        }, 
+        body: JSON.stringify({ driverName: selectedDriver, pickupStage: selectedStage })
+      });
+    
+      // YEH SCANNER EXACT ERROR PAKDEGA
+      const responseText = await res.text(); 
+    
+      if(!res.ok) {
+        // Agar error aaya toh ab exact reason screen pe dikhega!
+        alert(`❌ Asli Error Pakda Gaya!\n\nStatus Code: ${res.status}\nMessage: ${responseText}`);
+        return; 
+      }
+    
+      alert("Logistics tracking updated successfully! 🚚");
+      closePickupModal(); loadSystemData();
+    
+    } catch (err) { 
+      alert("Network Error: " + err.message); 
+    }
+    };
+
+    document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); window.location.href = "login.html"; };
+    loadSystemData();
+  </script>
+</body>
+</html>

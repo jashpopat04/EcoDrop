@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoDrop - Sign Up</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+
+<body class="auth-body">
+
+    <div class="auth-container max-w-lg">
+
+        <!-- Logo -->
+        <div class="auth-logo text-center mb-10">
+            <div class="logo-box justify-center mb-6">
+                <img src="../assets/images/logo.png" class="logo-img">
+                <span class="logo-text">EcoDrop</span>
+            </div>
+
+            <h1 class="auth-title text-3xl">
+                Create Your EcoDrop Account
+            </h1>
+            <p class="auth-subtitle">
+                Start your recycling journey today
+            </p>
+        </div>
+
+        <div class="auth-card">
+
+            <form id="signupForm" novalidate>
+
+                <div id="errorBox" class="hidden error-box mb-4"></div>
+
+                <!-- Role -->
+                <div class="mb-6">
+                    <label class="font-semibold text-[var(--deep-sea)] block mb-3">
+                        Create account as
+                    </label>
+
+                    <div class="flex gap-6">
+                        <label>
+                            <input type="radio" name="role" value="seller" checked>
+                            Seller
+                        </label>
+
+                        <label>
+                            <input type="radio" name="role" value="recycler">
+                            Recycler
+                        </label>
+                    </div>
+                </div>
+
+                <!-- SELLER -->
+                <div id="sellerFields" class="space-y-4">
+
+                    <input type="text" id="sellerName" placeholder="Enter your name"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <input type="email" id="sellerEmail" placeholder="Enter your email"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <div class="relative">
+                        <input type="password" id="sellerPassword" placeholder="Create strong password"
+                            class="input-glass w-full rounded-2xl px-4 py-3" required>
+                        <span
+                            class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer opacity-60 hover:opacity-100"
+                            data-target="sellerPassword">
+                            👁️
+                        </span>
+                    </div>
+                    <input type="tel" id="sellerPhone" placeholder="Enter your phone number"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                </div>
+
+                <!-- RECYCLER -->
+                <div id="recyclerFields" class="space-y-4 hidden">
+
+                    <input type="text" id="companyName" placeholder="Company Name"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <input type="text" id="authorizedPerson" placeholder="Authorized Person Name"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <input type="tel" id="contactNumber" placeholder="Contact Number"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <input type="text" id="gstNumber" placeholder="GST Number"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <input type="email" id="recyclerEmail" placeholder="Company Email"
+                        class="input-glass w-full rounded-2xl px-4 py-3" required>
+
+                    <div class="relative">
+                        <input type="password" id="recyclerPassword" placeholder="Create strong password"
+                            class="input-glass w-full rounded-2xl px-4 py-3" required>
+                        <span
+                            class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer opacity-60 hover:opacity-100"
+                            data-target="recyclerPassword">
+                            👁️
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <button type="submit" id="signupBtn" class="btn-primary mt-6">
+                    Create Account
+                </button>
+
+            </form>
+        </div>
+
+        <div class="text-center mt-6">
+            <p class="text-[var(--muted-green)]">
+                Already have an account?
+                <a href="login.html" class="text-[var(--forest-green)] font-semibold">
+                    Sign in
+                </a>
+            </p>
+        </div>
+
+    </div>
+
+    <script src="../assets/js/signup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EcoDrop - Recycler Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    /* ECODROP ORIGINAL THEME STYLES */
+    :root {
+      --primary: #4CAF50; --primary-dark: #4a7c59; --primary-light: #e8f5e5;
+      --bg-color: transparent; --surface: #FFFFFF;
+      --text-main: #1a3c34; --text-muted: #4a7c59; --text-light: #81C784;
+      --border: #cfe3d6; --danger: #e63946; 
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+    
+    body { background: linear-gradient(135deg, #f8f9e8, #e8f5e5); color: var(--text-main); min-height: 100vh; }
+    
+    /* NAVBAR */
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: linear-gradient(135deg, #ffffff, #f4fbf6); border-bottom: 1px solid rgba(232, 245, 229, 0.5); box-shadow: 0 12px 32px rgba(26, 60, 52, 0.12); position: sticky; top: 0; z-index: 50;}
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; background: linear-gradient(135deg, #2d5a4a, #4a7c59); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4CAF50, #81C784); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);}
+    .nav-right { display: flex; align-items: center; gap: 20px; position: relative;}
+    .bell-icon { font-size: 20px; color: var(--text-muted); cursor: pointer; position: relative;}
+    .bell-dot { position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid white;}
+    .avatar-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; background: none;}
+    .avatar { width: 45px; height: 45px; background: conic-gradient(from 45deg, #4CAF50, #81C784, #A5D6A7, #C8E6C9, #4CAF50); color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);}
+    
+    /* DROPDOWN MENU */
+    .dropdown { position: absolute; top: 60px; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(26,60,52,0.1); width: 220px; display: none; flex-direction: column; overflow: hidden; z-index: 100;}
+    .dropdown.show { display: flex; }
+    .dropdown a { padding: 14px 20px; text-decoration: none; color: var(--text-main); font-size: 14px; font-weight: 500; border-bottom: 1px solid var(--primary-light); transition: 0.2s;}
+    .dropdown a:hover { background: var(--primary-light); color: var(--primary-dark); }
+    .dropdown a.logout { color: var(--danger); border-bottom: none;}
+    .dropdown a.logout:hover { background: #ffebee; color: #DC2626; }
+
+    /* LAYOUT */
+    .container { max-width: 1400px; margin: 0 auto; padding: 32px; display: grid; grid-template-columns: 3fr 1fr; gap: 32px; align-items: start;}
+    .main-content { display: flex; flex-direction: column; gap: 32px; }
+    .sidebar { display: flex; flex-direction: column; gap: 24px; position: sticky; top: 100px; height: fit-content;}
+
+    /* SHARED CARDS */
+    .stat-card, .lot-card, .table-card, .side-card { background: var(--surface); padding: 24px; border-radius: 16px; border: none; box-shadow: 0 10px 24px rgba(26, 60, 52, 0.15); transition: 0.3s; }
+    .lot-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(76, 175, 80, 0.2); }
+
+    /* STATS ROW */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .stat-card { display: flex; justify-content: space-between; align-items: flex-start;}
+    .stat-val { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 4px;}
+    .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500;}
+    .stat-icon { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary-dark); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(76,175,80,0.1);}
+
+    /* SECTION TITLES */
+    .section-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;}
+
+    /* BULK LOTS GRID */
+    .lots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .lot-card { display: flex; flex-direction: column; gap: 16px; }
+    .lot-header { display: flex; justify-content: space-between; align-items: flex-start;}
+    .lot-loc { font-size: 15px; font-weight: 600; color: var(--text-main); }
+    .lot-weight-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 15px;}
+    .lot-weight-label { font-size: 13px; color: var(--text-muted); }
+    .lot-weight-val { font-size: 22px; font-weight: 700; color: var(--text-main); }
+    
+    .progress-bg { width: 100%; height: 6px; background: #E2E8F0; border-radius: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+    .fill-green { background: var(--primary-dark); } 
+    .fill-soft-green { background: #81C784; } 
+    
+    .lot-thresh { font-size: 12px; color: var(--text-muted); display:flex; justify-content: space-between; margin-top:8px;}
+    .btn-accept { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--primary-dark); color: white; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.2s; box-shadow: 0 6px 14px rgba(45, 90, 74, 0.35); margin-top: 15px;}
+    .btn-accept:not(:disabled):hover { background: #2d5a4a; }
+    .btn-disabled { background: var(--primary-light); color: var(--primary-dark); box-shadow: none; cursor: not-allowed; border: 1px dashed var(--border); }
+
+    /* FORECAST LIST STYLES */
+    .forecast-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px;}
+    .forecast-item:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0;}
+    .fc-left { display: flex; flex-direction: column; gap: 8px; width: 65%;}
+    .fc-title { font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .fc-weight { font-size: 12px; color: var(--text-muted); }
+    .fc-right { color: var(--primary-dark); font-weight: 600; font-size: 13px; }
+
+    /* SIDEBAR CARDS */
+    .side-header { font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin-bottom: 24px;}
+    .impact-item { margin-bottom: 24px;}
+    .impact-val { font-size: 28px; font-weight: 800; color: var(--text-main); }
+    .impact-val.green { color: var(--primary-dark); }
+    .impact-label { font-size: 13px; color: var(--text-muted); margin-top: 4px;}
+    .tree-eq { font-size: 13px; font-weight: 500; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; margin-top: 16px; background: var(--primary-light); padding: 8px 12px; border-radius: 8px;}
+    .insight-text { font-size: 13px; color: var(--text-muted); line-height: 1.6;}
+
+    /* TABLES */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 16px 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    td { padding: 16px 12px; font-size: 14px; font-weight: 500; color: var(--text-main); border-bottom: 1px solid var(--primary-light); }
+    .status-completed { color: var(--primary-dark); font-weight: 600;}
+    .status-progress { color: #3B82F6; font-weight: 600;}
+    
+    /* LEADERBOARD & SEARCH */
+    .search-wrapper { display: flex; align-items: center; background: #f8f9e8; border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; margin-bottom: 30px; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+    .search-wrapper:focus-within { border-color: var(--primary-dark); box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15); background: #ffffff;}
+    .search-wrapper input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; color: var(--text-main); padding-left: 10px; font-weight: 500;}
+    .search-wrapper input::placeholder { color: #81C784; }
+    
+    .podium-wrapper { display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin-bottom: 40px; }
+    .podium-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 10px; text-align: center; width: 130px; box-shadow: 0 8px 20px rgba(26,60,52,0.06); transition: 0.3s;}
+    .podium-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--primary-light); color: var(--primary-dark); font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid var(--surface); box-shadow: 0 4px 10px rgba(76,175,80,0.15);}
+    .podium-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px;}
+    .podium-kg { font-size: 13px; color: var(--primary-dark); font-weight: 700;}
+    
+    .rank-1 { border: 2px solid var(--primary-dark); transform: translateY(-15px); box-shadow: 0 15px 30px rgba(76, 175, 80, 0.15); background: linear-gradient(180deg, #ffffff 0%, #f4fbf6 100%); position: relative;}
+    .rank-1 .podium-avatar { background: var(--primary-dark); color: white; width: 60px; height: 60px; font-size: 22px; border-color: var(--primary-light);}
+    .premium-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #f8f9e8; border-radius: 50%; padding: 6px; box-shadow: 0 4px 10px rgba(26,60,52,0.1); border: 1px solid #cfe3d6; display: flex;}
+    
+    .highlight-row { background: var(--primary-light) !important; }
+    .highlight-row td { color: var(--primary-dark); font-weight: 700; }
+    
+    .btn-outline { background: transparent; border: 2px solid var(--primary-dark); color: var(--primary-dark); padding: 10px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 20px;}
+    .btn-outline:hover { background: var(--primary-dark); color: white; box-shadow: 0 6px 14px rgba(45, 90, 74, 0.2);}
+  
+    .dashboard-logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  transition: 0.3s ease;
+}
+
+.dashboard-logo:hover {
+  transform: scale(1.05);
+}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="brand">
+      <div class="logo-section">
+        <img src="../assets/images/logo.png" alt="EcoDrop Logo" class="dashboard-logo">
+      </div> 
+      EcoDrop
+    </div>
+    <div class="nav-right">
+      <div class="bell-icon" style="position: relative; display: flex; align-items: center; color: var(--text-muted);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <div class="bell-dot"></div>
+      </div>
+
+      <button class="avatar-btn" onclick="toggleDropdown()">
+        <div class="avatar" id="avatarInitial">R</div>
+        <span style="font-size: 12px; color: var(--text-muted);">▼</span>
+      </button>
+      
+      <div class="dropdown" id="profileDropdown">
+        <a href="#">View Profile</a>
+        <a href="#">Edit Accepted Categories</a>
+        <a href="#">Update City</a>
+        <a href="#">Change Password</a>
+        <a href="#" class="logout" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    
+    <div class="main-content">
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div><div class="stat-val" id="stat-kg">0</div><div class="stat-label">Total KG Collected</div></div>
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div><div class="stat-val">4</div><div class="stat-label">Warehouses Served</div></div>
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div><div class="stat-val" id="stat-spent">₹0</div><div class="stat-label">Total Spent</div></div>
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div><div class="stat-val">5</div><div class="stat-label">Accepted Categories</div></div>
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2.9C19.1 4.8 19 7.9 21 9.9l-7.7 7.7a2 2 0 0 1-2.8 0l-5-5a2 2 0 0 1 0-2.8l7.7-7.7c2-2 5.1-2.1 7 .8z"></path><path d="M3 21l3-3"></path><path d="M11 13l-3 3"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Bulk Ready for Pickup</h2>
+        <div class="lots-grid" id="lotsContainer">
+          <div style="grid-column: span 3; padding: 40px; text-align: center; color: var(--text-muted);">
+            Loading available lots...
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <h2 class="section-title">Upcoming Bulk Forecast</h2>
+        <div id="forecastContainer">
+          <div style="text-align: center; color: var(--text-muted); padding: 20px;">No upcoming forecasts...</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <h2 class="section-title">Pickup History</h2>
+        <table>
+          <thead><tr><th>Warehouse</th><th>Category</th><th>Weight</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr><td>Pune Warehouse</td><td>PCB</td><td>45kg</td><td class="status-completed">Completed</td><td>2026-02-15</td></tr>
+            <tr><td>Mumbai Central</td><td>Battery</td><td>55kg</td><td class="status-completed">Completed</td><td>2026-02-14</td></tr>
+            <tr><td>Bangalore Hub</td><td>Appliance</td><td>95kg</td><td class="status-progress">In Progress</td><td>2026-02-16</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-card">
+        <h2 class="section-title" style="text-align: center; margin-bottom: 24px;">🏆 Top Recyclers (Live)</h2>
+        
+        <div class="search-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-dark);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" placeholder="Search recycler by name or city..." onkeyup="filterLeaderboard()">
+        </div>
+
+        <div class="podium-wrapper" id="podiumContainer">
+          </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead><tr><th>Rank</th><th>Recycler Name</th><th>Total KG Recycled</th><th>Contribution Level</th></tr></thead>
+            <tbody id="leaderboardTableBody">
+              </tbody>
+          </table>
+        </div>
+        
+        <div style="text-align: center;">
+          <button class="btn-outline" id="showMoreBtn" onclick="toggleShowMore()">Show More</button>
+        </div>
+      </div>
+      
+    </div> <div class="sidebar">
+      
+      <div class="side-card">
+        <div class="side-header">🌍 Environmental Impact</div>
+        
+        <div class="impact-item">
+          <div class="impact-val" id="impact-kg">0 kg</div>
+          <div class="impact-label">E-Waste Processed</div>
+        </div>
+        
+        <div class="impact-item">
+          <div class="impact-val green" id="impact-co2">0 kg</div>
+          <div class="impact-label">CO₂ Emissions Prevented</div>
+        </div>
+        
+        <div class="tree-eq">
+          🌳 Equivalent to <span id="impact-trees">0</span> trees planted
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="side-header">ⓘ Regulatory Insight</div>
+        <p class="insight-text">
+          As per E-Waste Management Rules 2022, authorized recyclers must ensure environmentally sound management and maintain detailed records of collection and processing. Ensure all bulk lots are processed within 180 days of pickup to maintain compliance.
+        </p>
+      </div>
+
+    </div> </div> <script>
+    const API_BASE = "http://localhost:5000/api";
+    const token = localStorage.getItem("token");
+    let realName = "Recycler";
+    const BULK_THRESHOLD = 50; 
+
+    if (!token) window.location.href = "login.html";
+
+    function toggleDropdown() { document.getElementById("profileDropdown").classList.toggle("show"); }
+    window.onclick = function(event) { if (!event.target.closest('.nav-right')) document.getElementById("profileDropdown").classList.remove('show'); }
+    function logout() { localStorage.clear(); window.location.href = "login.html"; }
+
+    // FETCH PROFILE
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/users/profile`, { headers: { "Authorization": `Bearer ${token}` } });
+        const data = await res.json();
+        if(data.name) {
+          realName = data.name;
+          let initials = realName.substring(0,2).toUpperCase();
+          if(realName.split(" ").length > 1) {
+             initials = realName.split(" ")[0][0] + realName.split(" ")[1][0];
+          }
+          document.getElementById("avatarInitial").textContent = initials;
+        }
+      } catch(e) { console.error(e); }
+    };
+
+    // LOAD STATS & PASS TO LEADERBOARD
+    const loadStats = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/waste/recycler/dashboard`, { headers: { "Authorization": `Bearer ${token}` } });
+        const data = await res.json();
+        
+        const totalKg = data.totalPurchases ? (data.totalPurchases * 15) : 0; 
+        
+        document.getElementById("stat-spent").textContent = `₹${data.totalSpent ? data.totalSpent.toLocaleString() : '0'}`;
+        document.getElementById("stat-kg").textContent = totalKg;
+        
+        const co2 = Math.round(totalKg * 0.8);
+        const trees = Math.round(co2 / 20);
+        document.getElementById("impact-kg").textContent = `${totalKg} kg`;
+        document.getElementById("impact-co2").textContent = `${co2} kg`;
+        document.getElementById("impact-trees").textContent = trees;
+
+        loadLeaderboardData(totalKg);
+      } catch (err) { console.error(err); }
+    };
+
+    // LEADERBOARD LOGIC
+    let allRecyclers = [];
+    let visibleTableCount = 5; 
+    let isExpanded = false;
+
+    const loadLeaderboardData = async (myRealKg = 0) => {
+        try {
+            let realRecyclers = [ { name: realName, kg: myRealKg, isMe: true } ];
+            const mockRecyclers = [
+                { name: "Attero Recycling", kg: 12500, isMe: false },
+                { name: "GreenIT Disposal", kg: 9200, isMe: false },
+                { name: "EcoMetals India", kg: 8150, isMe: false },
+                { name: "TechSave India", kg: 5950, isMe: false },
+                { name: "E-Waste Corp", kg: 4720, isMe: false },
+                { name: "Pune Recyclers", kg: 2950, isMe: false },
+                { name: "Mumbai Scrap Hub", kg: 1820, isMe: false },
+                { name: "Global E-Waste", kg: 1600, isMe: false },
+                { name: "Nature Savers", kg: 1450, isMe: false }
+            ];
+
+            allRecyclers = [...realRecyclers, ...mockRecyclers];
+            allRecyclers.sort((a, b) => b.kg - a.kg);
+            renderLeaderboard();
+        } catch(e) { console.error(e); }
+    };
+
+    const renderLeaderboard = (searchTerm = "") => {
+        const filtered = allRecyclers.filter(r => r.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        
+        const podiumContainer = document.getElementById("podiumContainer");
+        const tableBody = document.getElementById("leaderboardTableBody");
+        const showMoreBtn = document.getElementById("showMoreBtn");
+
+        podiumContainer.innerHTML = "";
+        tableBody.innerHTML = "";
+
+        if (filtered.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">No recyclers found matching "${searchTerm}"</td></tr>`;
+            podiumContainer.style.display = "none";
+            showMoreBtn.style.display = "none";
+            return;
+        }
+
+        podiumContainer.style.display = "flex";
+        const top3 = filtered.slice(0, 3);
+        const premiumBadge = `<div class="premium-badge"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="var(--primary-dark)" stroke="var(--primary-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>`;
+
+        if (top3[1]) podiumContainer.innerHTML += createPodiumBox(top3[1], 2);
+        if (top3[0]) podiumContainer.innerHTML += createPodiumBox(top3[0], 1, premiumBadge);
+        if (top3[2]) podiumContainer.innerHTML += createPodiumBox(top3[2], 3);
+
+        const rest = filtered.slice(3);
+        if (rest.length === 0) {
+            showMoreBtn.style.display = "none";
+            return;
+        }
+
+        const itemsToShow = isExpanded ? rest.length : Math.min(visibleTableCount, rest.length);
+        
+        for (let i = 0; i < itemsToShow; i++) {
+            const r = rest[i];
+            // Find actual rank in the FULL sorted array so it doesn't jump incorrectly
+            const actualRank = allRecyclers.findIndex(x => x.name === r.name) + 1; 
+            
+            const rowClass = r.isMe ? 'class="highlight-row"' : '';
+            const contribution = r.kg > 5000 ? "High 🌳" : (r.kg > 2000 ? "Medium 🌿" : "Growing 🌱");
+            const meBadge = r.isMe ? '<span style="background:var(--primary-dark); color:white; padding:2px 8px; border-radius:10px; font-size:10px; margin-left:8px;">You</span>' : '';
+
+            tableBody.innerHTML += `
+                <tr ${rowClass}>
+                    <td style="font-weight:600; color:var(--text-muted);">#${actualRank}</td>
+                    <td style="font-weight:600; color:var(--text-main);">${r.name} ${meBadge}</td>
+                    <td style="font-weight:700; color:var(--primary-dark);">${r.kg.toLocaleString()} KG</td>
+                    <td style="color:var(--text-muted);">${contribution}</td>
+                </tr>
+            `;
+        }
+
+        if (rest.length > visibleTableCount && searchTerm === "") {
+            showMoreBtn.style.display = "inline-block";
+            showMoreBtn.textContent = isExpanded ? "Show Less" : "Show More";
+        } else {
+            showMoreBtn.style.display = "none"; 
+        }
+    };
+
+    const createPodiumBox = (user, rank, extraHtml = "") => {
+        const isRank1 = rank === 1 ? "rank-1" : "";
+        const meBadge = user.isMe ? '<div style="font-size:10px; color:var(--danger); font-weight:700; margin-top:4px;">(You)</div>' : '';
+        return `
+          <div class="podium-box ${isRank1}">
+            ${extraHtml}
+            <div class="podium-avatar">#${rank}</div>
+            <div class="podium-name" title="${user.name}">${user.name}</div>
+            <div class="podium-kg">${user.kg.toLocaleString()} KG</div>
+            ${meBadge}
+          </div>
+        `;
+    };
+
+    const filterLeaderboard = () => { renderLeaderboard(document.getElementById("searchInput").value); };
+    const toggleShowMore = () => { isExpanded = !isExpanded; renderLeaderboard(); };
+
+    // LOAD LOTS & FORECAST
+    const loadLots = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/waste/available`, { headers: { "Authorization": `Bearer ${token}` } });
+        const wastes = await res.json();
+        
+        const gridContainer = document.getElementById("lotsContainer");
+        const forecastContainer = document.getElementById("forecastContainer");
+        gridContainer.innerHTML = "";
+        forecastContainer.innerHTML = "";
+
+        if (wastes.length === 0) {
+            gridContainer.innerHTML = "<div style='grid-column:span 3; text-align:center; padding:40px; color:var(--text-muted);'>No lots available right now.</div>";
+            forecastContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--text-muted);'>No forecast data.</div>";
+            return;
+        }
+
+        const lots = {};
+        wastes.forEach(w => {
+            const catFixed = w.category.replace('-', ' ');
+            const key = `${w.warehouse}_${catFixed}`;
+            if (!lots[key]) {
+                lots[key] = { warehouse: w.warehouse || "Central Hub", category: catFixed, totalWeight: 0, totalValue: 0, itemIds: [] };
+            }
+            lots[key].totalWeight += w.weight;
+            lots[key].totalValue += w.finalValue;
+            lots[key].itemIds.push(w._id);
+        });
+
+        let forecastCount = 0;
+
+        Object.values(lots).forEach(lot => {
+            let pct = (lot.totalWeight / BULK_THRESHOLD) * 100;
+            if (pct > 100) pct = 100;
+            const isReady = lot.totalWeight >= BULK_THRESHOLD;
+            
+            const barClass = isReady ? "fill-green" : "fill-soft-green";
+            const btnClass = isReady ? "btn-accept" : "btn-accept btn-disabled";
+            const btnText = isReady ? `Accept Pickup (₹${lot.totalValue})` : `Not Ready Yet`;
+            const badgeText = isReady ? "Ready" : "Forecasted";
+            const badgeColor = isReady ? "#1a3c34" : "#4a7c59";
+            const badgeBg = isReady ? "#e8f5e5" : "#f4fbf6";
+            const badgeBorder = isReady ? "none" : "1px solid #cfe3d6";
+
+            gridContainer.innerHTML += `
+              <div class="lot-card">
+                <div class="lot-header">
+                  <div class="lot-loc">📍 ${lot.warehouse} <br><span style="font-size:12px; color:var(--text-muted); font-weight:500; margin-top:4px; display:block;">${lot.category}</span></div>
+                  <div style="color: ${badgeColor}; background: ${badgeBg}; border: ${badgeBorder}; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; height: fit-content;">${badgeText}</div>
+                </div>
+                
+                <div class="lot-weight-row">
+                  <div class="lot-weight-label">Current Stored Weight</div>
+                  <div class="lot-weight-val">⚖️ ${lot.totalWeight}kg</div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                  <div class="progress-bg"><div class="progress-fill ${barClass}" style="width: ${pct}%;"></div></div>
+                  <div class="lot-thresh">
+                    <span>Current: ${lot.totalWeight}kg</span>
+                    <span>Threshold: ${BULK_THRESHOLD}kg</span>
+                  </div>
+                </div>
+
+                <button class="${btnClass}" ${isReady ? '' : 'disabled'} onclick='purchaseLot(${JSON.stringify(lot.itemIds)}, ${lot.totalValue}, "${lot.warehouse}", "${lot.category}")'>
+                  ${btnText}
+                </button>
+              </div>
+            `;
+
+            if (!isReady) {
+                forecastCount++;
+                const daysLeft = Math.ceil((BULK_THRESHOLD - lot.totalWeight) / 5) || 1; 
+                forecastContainer.innerHTML += `
+                  <div class="forecast-item">
+                    <div class="fc-left">
+                      <div class="fc-title">${lot.warehouse} <span style="color:var(--text-muted); font-weight:400;">• ${lot.category}</span></div>
+                      <div class="progress-bg" style="background: #e8f5e5; margin-bottom: 6px;">
+                        <div class="progress-fill fill-soft-green" style="width: ${pct}%;"></div>
+                      </div>
+                      <div class="fc-weight">${lot.totalWeight}kg / ${BULK_THRESHOLD}kg</div>
+                    </div>
+                    <div class="fc-right">
+                      📈 Est. ready in ~${daysLeft} days
+                    </div>
+                  </div>
+                `;
+            }
+        });
+
+        if (forecastCount === 0) forecastContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--text-muted);'>All lots have crossed the threshold and are ready for pickup! 🚛</div>";
+      } catch (err) { console.error(err); }
+    };
+
+    window.purchaseLot = async (itemIds, totalBaseValue, warehouse, category) => {
+    // Check if value exists to prevent NaN
+    if (!totalBaseValue) {
+        alert("Error: Total value is missing!");
+        return;
+    }
+
+    // 1. Bill Calculation
+    const platformFee = totalBaseValue * 0.10;
+    const transportFee = 500;
+    const finalPayable = Math.round(totalBaseValue + platformFee + transportFee);
+
+    if(confirm(`Invoice Summary:\nBase: ₹${totalBaseValue}\nFee: ₹${platformFee}\nTransport: ₹${transportFee}\n\nTotal: ₹${finalPayable}\n\nProceed to Pay?`)) {
+        try {
+            // A. Backend se Order ID mangao
+            const res = await fetch(`${API_BASE}/payment/order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                // Backend ko ₹ bhej rahe hain, backend use * 100 karega
+                body: JSON.stringify({ amount: finalPayable }) 
+            });
+            const order = await res.json();
+
+            // B. Razorpay Options
+            const options = {
+                "key": "rzp_test_SIvjLWnnReNzAM", 
+                "amount": order.amount, // Backend se *100 hoke aana chahiye
+                "currency": "INR",
+                "name": "EcoDrop Logistics",
+                "description": `Bulk Purchase - ${category}`,
+                "order_id": order.id,
+                "prefill": {
+                    "method": "upi" // 👈 ISSE UPI OPTION SABSE PEHLE DIKHEGA
+                },
+                "handler": async function (response) {
+                    const verifyRes = await fetch(`${API_BASE}/waste/bulk-purchase`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ 
+                            wasteIds: itemIds,
+                            paymentId: response.razorpay_payment_id 
+                        })
+                    });
+                    
+                    if(verifyRes.ok) {
+                        alert("✅ Payment Successful! Your fleet is on the way.");
+                        window.location.reload();
+
+                        // loadLots();
+                        // loadStats();
+                    } else {
+                        const errText = await verifyRes.text(); // use text() instead of json()
+                        alert("Backend Update Failed: " + errText);
+                    }
+                },
+                "theme": { "color": "#15803D" }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+        } catch (err) {
+            console.error(err);
+            alert("Connection error. Check if Backend is running!");
+        }
+    }
+};
+
+    fetchProfile();
+    loadStats();
+    loadLots();
+  </script>
+</body>
+</html>

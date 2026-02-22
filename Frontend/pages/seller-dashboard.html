@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EcoDrop - Seller Dashboard</title>
+    <style>
+      /* COMBINED CSS - INLINE */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #f8f9e8, #e8f5e5);
+        color: #1f2937;
+      }
+      .app {
+        max-width: 1200px;
+        margin: auto;
+        padding: 30px;
+      }
+
+      /* Top Header */
+      .top-header {
+        background: linear-gradient(135deg, #ffffff, #f4fbf6);
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 35px;
+        box-shadow: 0 12px 32px rgba(26, 60, 52, 0.12);
+        border: 1px solid rgba(232, 245, 229, 0.5);
+      }
+      .top-header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .user-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .user-avatar-container {
+        position: relative;
+      }
+
+      .user-avatar {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: conic-gradient(
+          from 45deg,
+          #4caf50,
+          #81c784,
+          #a5d6a7,
+          #c8e6c9,
+          #4caf50
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+      }
+      .user-avatar:hover {
+        transform: translateY(-4px) scale(1.05);
+      }
+      .user-avatar .initials {
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        z-index: 2;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .user-status {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        width: 16px;
+        height: 16px;
+        background: #4caf50;
+        border-radius: 50%;
+        border: 3px solid white;
+        animation: pulse 2s infinite;
+      }
+
+      /* Avatar Dropdown */
+      .avatar-options {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        width: 180px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(26, 60, 52, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1002;
+        padding: 8px;
+        border: 1px solid rgba(232, 245, 229, 0.6);
+      }
+      .user-avatar-container.active .avatar-options {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+        visibility: visible;
+      }
+      .option-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: 14px;
+        color: #1a3c34;
+        border-radius: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .option-btn:hover {
+        background: #e8f5e5;
+        transform: translateX(4px);
+        transition: 0.2s;
+      }
+      .logout-btn {
+        color: #d32f2f !important;
+        border-top: 1px solid #eee;
+        margin-top: 8px;
+      }
+      .logout-btn:hover {
+        background: #ffebee !important;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .user-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a3c34;
+        margin: 0;
+      }
+      .eco-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: #4a7c59;
+        font-weight: 500;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .ecodrop-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #4caf50, #81c784);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+      }
+      .logo {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2d5a4a, #4a7c59);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .dashboard-logo {
+        height: 50px;
+        width: auto;
+        object-fit: contain;
+        transition: 0.3s ease;
+      }
+
+      .dashboard-logo:hover {
+        transform: scale(1.05);
+      }
+
+      /* Cards */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 35px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 10px 24px rgba(26, 60, 52, 0.15);
+        transition: 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+      }
+      .card b {
+        font-size: 22px;
+        color: #2d5a4a;
+      }
+
+      /* ECO CARD MODIFICATIONS RESTORED */
+      .eco-card {
+        position: relative;
+        padding-bottom: 35px;
+        height: 120px;
+      }
+      .eco-info-btn {
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .eco-card:hover .eco-info-btn {
+        display: block;
+      }
+      .eco-info-btn:hover {
+        background: #45a049;
+      }
+
+      /* Tables */
+      .table-box,
+      .leaderboard-box {
+        background: #fff;
+        padding: 25px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 24px rgba(26, 60, 52, 0.15);
+      }
+      h2 {
+        color: #1a3c34;
+        margin-bottom: 15px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+      }
+      th {
+        background: #e8f5e5;
+        padding: 12px;
+        color: #1a3c34;
+        text-align: left;
+      }
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #d6e6db;
+        font-size: 14px;
+      }
+      .you-row td {
+        background-color: rgba(76, 175, 80, 0.15) !important;
+        font-weight: 600;
+      }
+      .badge-you {
+        background: #4caf50;
+        color: white;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 6px;
+        font-weight: bold;
+      }
+
+      /* Buttons & Inputs */
+      button {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 10px;
+        background: #4a7c59;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 6px 14px rgba(45, 90, 74, 0.35);
+      }
+      button:hover {
+        background: #2d5a4a;
+      }
+      .show-more-btn {
+        background: #4caf50;
+        padding: 12px 24px;
+        margin-top: 20px;
+      }
+      .add-btn {
+        display: block;
+        margin: 15px auto;
+      }
+
+      /* Modals */
+      .form-box,
+      .eco-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(26, 60, 52, 0.55);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .form-content,
+      .eco-modal-content {
+        background: #fff;
+        padding: 25px;
+        border-radius: 18px;
+        width: 420px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 8px;
+        border: 1px solid #cfe3d6;
+        background: #f8f9e8;
+      }
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      #pickupExtraFields {
+        display: none;
+        background: #f4fbf6;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px dashed #4caf50;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="top-header">
+        <div class="top-header-content">
+          <div class="logo-section">
+            <img
+              src="../assets/images/logo.png"
+              alt="EcoDrop Logo"
+              class="dashboard-logo"
+            />
+            <div class="logo">EcoDrop</div>
+          </div>
+          <div class="user-section">
+            <div class="user-avatar-container" id="userAvatarContainer">
+              <div class="user-avatar" id="userAvatar">
+                <span class="initials" id="userInitial">U</span>
+                <div class="user-status"></div>
+              </div>
+
+              <div class="avatar-options" id="avatarOptions">
+                <button
+                  class="option-btn"
+                  onclick="alert('Profile settings coming soon!')"
+                >
+                  👤 Profile
+                </button>
+                <button
+                  class="option-btn"
+                  onclick="alert('Account settings coming soon!')"
+                >
+                  ⚙️ Settings
+                </button>
+                <button class="option-btn logout-btn" id="logoutBtn">
+                  🚪 Logout
+                </button>
+              </div>
+            </div>
+            <div class="user-info">
+              <h3 class="user-name" id="userNameDisplay">Hi, User</h3>
+              <div class="eco-badge" id="headerEcoBadge">
+                <span id="headerEcoIcon">🌱</span>
+                <span id="headerEcoLevel">Seed</span> •
+                <span id="userPoints">0</span> pts
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">Total E-Waste<br /><b id="totalKg">0 KG</b></div>
+        <div class="card">🌍 CO₂ Prevented<br /><b id="co2">0 KG</b></div>
+        <div class="card">Money Earned<br /><b id="money">₹0</b></div>
+        <div class="card">Eco Points<br /><b id="points">0</b></div>
+        <div class="card eco-card">
+          Eco Level<br /><b id="ecoLevel">🌱 Seed</b>
+          <button class="eco-info-btn" id="openEcoInfo">
+            <span>ℹ️</span> Eco Levels
+          </button>
+        </div>
+      </div>
+
+      <div class="eco-modal" id="ecoModal">
+        <div class="eco-modal-content">
+          <h3 style="color: #1a3c34; margin-bottom: 10px">
+            🌱 Eco Levels Breakdown
+          </h3>
+          <table style="width: 100%; text-align: left">
+            <tr style="background: #e8f5e5">
+              <th>Level</th>
+              <th>Points Needed</th>
+            </tr>
+            <tr>
+              <td>🌱 Seed</td>
+              <td>0–99 pts</td>
+            </tr>
+            <tr>
+              <td>🌿 Plant</td>
+              <td>100–299 pts</td>
+            </tr>
+            <tr>
+              <td>🌳 Tree</td>
+              <td>300–699 pts</td>
+            </tr>
+            <tr>
+              <td>🌍 Earth Hero</td>
+              <td>700+ pts</td>
+            </tr>
+          </table>
+          <br />
+          <button
+            onclick="document.getElementById('ecoModal').style.display = 'none'"
+            style="width: 100%"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div class="form-box" id="listingForm">
+        <div class="form-content">
+          <h3>Add Waste Listing</h3>
+
+          <input
+            id="itemInput"
+            placeholder="Device Name (e.g., Broken TV, Old Laptop)"
+          />
+          <input
+            id="weightInput"
+            type="number"
+            step="0.1"
+            placeholder="Estimated Weight (KG)"
+            min="0.1"
+          />
+
+          <select id="categoryInput">
+            <option value="">Select E-Waste Category</option>
+            <option value="large-appliances">🏠 Large Appliances</option>
+            <option value="small-appliances">🔌 Small Appliances</option>
+            <option value="it-telecom">💻 IT & Telecom</option>
+            <option value="consumer-electronics">
+              📺 Consumer Electronics
+            </option>
+            <option value="batteries">🔋 Batteries & Cables</option>
+            <option value="other">📦 Other</option>
+          </select>
+
+          <select id="warehouseInput">
+            <option value="">Select Nearest Warehouse</option>
+            <option value="Pune Warehouse">Pune Warehouse</option>
+            <option value="Mumbai Central">Mumbai Central</option>
+            <option value="Bangalore Hub">Bangalore Hub</option>
+            <option value="Delhi Warehouse">Delhi Warehouse</option>
+          </select>
+
+          <select id="pickupInput">
+            <option value="dropoff">Self Drop (Warehouse)</option>
+            <option value="pickup">Door Pickup</option>
+          </select>
+
+          <div id="pickupExtraFields">
+            <label style="font-size: 12px; color: #4a7c59; font-weight: bold"
+              >Select Pickup Schedule:</label
+            >
+            <input type="date" id="pickupDateInput" />
+            <select id="pickupSlotInput">
+              <option value="">Select Time Slot</option>
+              <option value="9-12">9 AM - 12 PM</option>
+              <option value="12-3">12 PM - 3 PM</option>
+              <option value="3-6">3 PM - 6 PM</option>
+              <option value="6-9">6 PM - 9 PM</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button id="submitForm" style="flex: 1">Submit Listing</button>
+            <button id="cancelForm" style="flex: 1; background: #e63946">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-box">
+        <h2>My Waste Listings</h2>
+        <div style="overflow-x: auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>KG</th>
+                <th>Warehouse</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Earned</th>
+              </tr>
+            </thead>
+            <tbody id="listingsBody"></tbody>
+          </table>
+        </div>
+        <button class="add-btn" id="openFormBtn">+ Add Listing</button>
+      </div>
+
+      <div class="leaderboard-box">
+        <h2>🏆 Leaderboard (Live)</h2>
+        <div style="overflow-x: auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>City</th>
+                <th>KG</th>
+                <th>Points</th>
+                <th>Level</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+        <div style="text-align: center">
+          <button
+            class="show-more-btn"
+            id="showMoreBtn"
+            onclick="toggleLeaderboard()"
+          >
+            Show More
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://localhost:5000/api";
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const realName = localStorage.getItem("name") || "User";
+
+      if (!token || role !== "seller") {
+        window.location.href = "login.html";
+      }
+
+      document.getElementById("userNameDisplay").textContent =
+        `Hi, ${realName}`;
+      document.getElementById("userInitial").textContent = realName
+        .charAt(0)
+        .toUpperCase();
+
+      let stats = { kg: 0, money: 0, points: 0 };
+      let visibleCount = 3;
+
+      const leaderboard = [
+        { name: "Ankit", city: "Pune", kg: 180, points: 850 },
+        { name: "Sneha", city: "Mumbai", kg: 120, points: 520 },
+        { name: "Rahul", city: "Bangalore", kg: 90, points: 310 },
+        { name: "Priya", city: "Delhi", kg: 75, points: 280 },
+        { name: "Amit", city: "Pune", kg: 65, points: 250 },
+        { name: realName, city: "Pune", kg: 0, points: 0 },
+      ];
+
+      // ==========================================
+      // 1. FETCH DATA FROM MONGODB
+      // ==========================================
+      const loadDashboardData = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/waste/seller/dashboard`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // 🚀 FIX: Token Expiration Check
+          if (res.status === 401 || res.status === 403) {
+            alert("Session expired! Please login again.");
+            localStorage.clear();
+            window.location.href = "login.html";
+            return;
+          }
+
+          const data = await res.json();
+
+          if (!res.ok)
+            throw new Error(data.message || "Failed to load dashboard");
+
+          stats.kg = data.totalKg || 0;
+          stats.money = data.totalMoney || 0;
+          stats.points = data.totalPoints || 0;
+          updateUI();
+
+          const currentUser = leaderboard.find((u) => u.name === realName);
+          if (currentUser) {
+            currentUser.kg = stats.kg;
+            currentUser.points = stats.points;
+          }
+          renderLeaderboard();
+
+          const tbody = document.getElementById("listingsBody");
+          tbody.innerHTML = "";
+
+          const categoryNames = {
+            "large-appliances": "🏠 Large Appliances",
+            "small-appliances": "🔌 Small Appliances",
+            "it-telecom": "💻 IT & Telecom",
+            "consumer-electronics": "📺 Consumer Electronics",
+            batteries: "🔋 Batteries & Cables",
+            other: "📦 Other",
+          };
+
+          const statusBadges = {
+            uploaded: { text: "⏳ Pending", color: "#f39c12" },
+            pickup_scheduled: { text: "🚚 Scheduled", color: "#e67e22" },
+            picked: { text: "📦 Picked Up", color: "#3498db" },
+            in_warehouse: { text: "🏢 At Warehouse", color: "#3498db" },
+            listed_for_recycler: { text: "✅ Verified", color: "#4CAF50" },
+            sold: { text: "💰 Sold", color: "#2d5a4a" },
+          };
+
+          if (data.wastes.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">No waste listings yet. Start adding!</td></tr>`;
+          }
+
+          data.wastes.forEach((w) => {
+            const itemName = w.itemName || "E-Waste Item";
+            const cat = categoryNames[w.category] || w.category;
+            const warehouse = w.warehouse || "Not Selected";
+            const method = w.method === "pickup" ? "Door Pickup" : "Self Drop";
+            const statusInfo = statusBadges[w.status] || {
+              text: w.status,
+              color: "gray",
+            };
+
+            // 🚀 FIX: Earned Logic Column
+            let earnedText = "⏳ Pending";
+            if (w.finalValue) {
+              let finalAmount = w.finalValue;
+              if (w.method === "pickup")
+                finalAmount = Math.max(0, finalAmount - 50);
+              earnedText = `
+              <div style="color: #2e7d32; font-weight: bold;">₹${finalAmount}</div>
+              <div style="color: #4CAF50; font-size: 12px; font-weight: bold;">+${w.ecoCoins || 0} Pts</div>
+            `;
+            }
+
+            tbody.innerHTML += `
+            <tr>
+              <td style="font-weight: 600; color: #1a3c34;">${itemName}</td>
+              <td>${cat}</td>
+              <td>${w.weight} KG</td>
+              <td>${warehouse}</td>
+              <td>${method}</td>
+              <td style="color: ${statusInfo.color}; font-weight: 600;">
+                 <span style="background: ${statusInfo.color}15; padding: 4px 10px; border-radius: 12px; border: 1px solid ${statusInfo.color}40;">
+                    ${statusInfo.text}
+                 </span>
+              </td>
+              <td>${earnedText}</td> </tr>
+          `;
+          });
+        } catch (err) {
+          console.error("Dashboard error:", err);
+        }
+      };
+
+      // ==========================================
+      // 2. POST NEW LISTING TO MONGODB
+      // ==========================================
+      document.getElementById("submitForm").onclick = async () => {
+        const itemName = document.getElementById("itemInput").value.trim();
+        const weight = Number(document.getElementById("weightInput").value);
+        const category = document.getElementById("categoryInput").value;
+        const warehouse = document.getElementById("warehouseInput").value;
+        const method = document.getElementById("pickupInput").value;
+        const pickupDate = document.getElementById("pickupDateInput").value;
+        const pickupSlot = document.getElementById("pickupSlotInput").value;
+
+        if (!itemName || !weight || !category || !warehouse) {
+          return alert(
+            "Device Name, Weight, Category and Warehouse are required!",
+          );
+        }
+        if (method === "pickup" && (!pickupDate || !pickupSlot)) {
+          return alert("Please select a valid Pickup Date and Time Slot!");
+        }
+
+        const submitBtn = document.getElementById("submitForm");
+        submitBtn.textContent = "Saving...";
+        submitBtn.disabled = true;
+
+        try {
+          const payload = { itemName, category, weight, method, warehouse };
+          if (method === "pickup") {
+            payload.pickupDate = pickupDate;
+            payload.pickupSlot = pickupSlot;
+          }
+
+          const res = await fetch(`${API_BASE}/waste/upload`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Upload failed");
+
+          alert("Awesome! Your item is added to the Waitlist/Pending state.");
+
+          // 🚀 FIX: Form Reset logic safely done
+          document.getElementById("itemInput").value = "";
+          document.getElementById("weightInput").value = "";
+          document.getElementById("categoryInput").value = "";
+          document.getElementById("warehouseInput").value = "";
+          document.getElementById("listingForm").style.display = "none";
+
+          await loadDashboardData();
+        } catch (err) {
+          alert("Error: " + err.message);
+        } finally {
+          submitBtn.textContent = "Submit Listing";
+          submitBtn.disabled = false;
+        }
+      };
+
+      // UI Helper Functions
+      const getLevelWithIcon = (points) => {
+        if (points >= 700) return { icon: "🌍", level: "Earth Hero" };
+        if (points >= 300) return { icon: "🌳", level: "Tree" };
+        if (points >= 100) return { icon: "🌿", level: "Plant" };
+        return { icon: "🌱", level: "Seed" };
+      };
+
+      const updateUI = () => {
+        document.getElementById("totalKg").textContent = stats.kg + " KG";
+        document.getElementById("money").textContent = "₹" + stats.money;
+        document.getElementById("points").textContent = stats.points;
+        document.getElementById("co2").textContent =
+          (stats.kg * 0.8).toFixed(1) + " KG";
+
+        const levelData = getLevelWithIcon(stats.points);
+        document.getElementById("ecoLevel").innerHTML =
+          `${levelData.icon} ${levelData.level}`;
+        document.getElementById("headerEcoIcon").textContent = levelData.icon;
+        document.getElementById("headerEcoLevel").textContent = levelData.level;
+        document.getElementById("userPoints").textContent = stats.points;
+      };
+
+      const renderLeaderboard = () => {
+        const sorted = [...leaderboard].sort((a, b) => b.points - a.points);
+        document.getElementById("leaderboardBody").innerHTML = "";
+        sorted.slice(0, visibleCount).forEach((u, i) => {
+          const isMe = u.name === realName;
+          const rowClass = isMe ? 'class="you-row"' : "";
+          const badge = isMe ? '<span class="badge-you">You</span>' : "";
+          document.getElementById("leaderboardBody").innerHTML += `
+          <tr ${rowClass}>
+            <td>#${i + 1}</td>
+            <td>${u.name} ${badge}</td>
+            <td>${u.city}</td>
+            <td>${u.kg}</td>
+            <td>${u.points}</td>
+            <td>${getLevelWithIcon(u.points).icon} ${getLevelWithIcon(u.points).level}</td>
+          </tr>
+        `;
+        });
+        document.getElementById("showMoreBtn").textContent =
+          visibleCount >= leaderboard.length ? "Show Less" : "Show More";
+      };
+
+      const toggleLeaderboard = () => {
+        visibleCount =
+          visibleCount >= leaderboard.length ? 3 : leaderboard.length;
+        renderLeaderboard();
+      };
+
+      // Dropdown / UI Logic
+      document
+        .getElementById("pickupInput")
+        .addEventListener("change", function () {
+          document.getElementById("pickupExtraFields").style.display =
+            this.value === "pickup" ? "block" : "none";
+        });
+
+      document.getElementById("userAvatar").onclick = () => {
+        document
+          .getElementById("userAvatarContainer")
+          .classList.toggle("active");
+      };
+
+      // Close avatar menu if clicked outside
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-avatar-container")) {
+          document
+            .getElementById("userAvatarContainer")
+            .classList.remove("active");
+        }
+      });
+
+      // OPEN ECO MODAL
+      document.getElementById("openEcoInfo").onclick = () => {
+        document.getElementById("ecoModal").style.display = "flex";
+      };
+
+      document.getElementById("logoutBtn").onclick = () => {
+        localStorage.clear();
+        window.location.href = "login.html";
+      };
+
+      document.getElementById("openFormBtn").onclick = () => {
+        document.getElementById("listingForm").style.display = "flex";
+      };
+      document.getElementById("cancelForm").onclick = () => {
+        document.getElementById("listingForm").style.display = "none";
+      };
+
+      // Start App
+      loadDashboardData();
+    </script>
+  </body>
+</html>
