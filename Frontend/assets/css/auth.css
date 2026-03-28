@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+    --dark-green: #1a3c34;
+    --deep-sea: #2d5a4a;
+    --forest-green: #4a7c59;
+    --light-forest: #6b9b76;
+    --bg-beige: #f8f9e8;
+    --light-mint: #e8f5e5;
+    --muted-green: #5a6c5a;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+.auth-body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-beige), var(--light-mint));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.logo-img {
+    width: 45px;
+}
+
+.logo-text {
+    font-size: 26px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--deep-sea), var(--forest-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-title {
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--deep-sea);
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--muted-green);
+    margin-bottom: 30px;
+}
+
+.auth-card {
+    background: rgba(255,255,255,0.95);
+   
+    border: 2px solid rgba(74,124,89,0.2);
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: var(--deep-sea);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--forest-green);
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    border-radius: 30px;
+    border: 2px solid rgba(74,124,89,0.2);
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-wrapper input:focus {
+    border-color: var(--forest-green);
+    box-shadow: 0 0 0 4px rgba(74,124,89,0.1);
+}
+
+#togglePassword {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--muted-green);
+}
+
+.remember-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.remember-row a {
+    color: var(--forest-green);
+    font-weight: 600;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--forest-green), var(--light-forest));
+    color: white;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+.divider {
+    text-align: center;
+    margin: 25px 0;
+    color: var(--muted-green);
+}
+
+.social-row {
+    display: flex;
+    gap: 10px;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 25px;
+    border: 2px solid rgba(74,124,89,0.2);
+    background: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.social-btn:hover {
+    background: var(--light-mint);
+}
+
+.bottom-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.bottom-link a {
+    color: var(--forest-green);
+    font-weight: 700;
+}
+
+.footer-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted-green);
+}
+
+.error-box {
+    background: #ffeaea;
+    color: #c0392b;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+/* Eye icon specific styling */
+.toggle-password {
+    user-select: none;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+/* Taaki text eye icon ke niche na chala jaye */
+.input-glass {
+    padding-right: 3.5rem !important;
+}

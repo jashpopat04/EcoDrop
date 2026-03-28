@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ORIGINAL ECO COLORS (UNCHANGED) */
+.eco-hero { background: linear-gradient(135deg, #1a3c34 0%, #2d5a4a 50%, #4a7c59 100%); }
+.eco-gradient-bg { background: linear-gradient(135deg, #2d5a4a 0%, #1a3c34 100%); }
+.eco-impact-bg { background: linear-gradient(135deg, #f8f9e8 0%, #e8f5e5 50%, #f0f7ec 100%); }
+.eco-card-green { background: linear-gradient(135deg, rgba(74, 124, 89, 0.2) 0%, rgba(42, 90, 74, 0.2) 100%); }
+.eco-card-blue { background: linear-gradient(135deg, rgba(52, 152, 219, 0.15) 0%, rgba(41, 128, 185, 0.15) 100%); }
+.eco-card-gold { background: linear-gradient(135deg, rgba(241, 196, 15, 0.2) 0%, rgba(243, 156, 18, 0.2) 100%); }
+.eco-card-orange { background: linear-gradient(135deg, rgba(230, 126, 34, 0.2) 0%, rgba(211, 84, 0, 0.2) 100%); }
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.glass-effect {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.how-works-card {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.how-works-card:hover {
+    transform: translateY(-15px) scale(1.02);
+}
+
+/* Minor Premium Polish */
+#navbar.scrolled {
+    background: rgba(26, 60, 52, 0.9);
+    backdrop-filter: blur(25px);
+}
